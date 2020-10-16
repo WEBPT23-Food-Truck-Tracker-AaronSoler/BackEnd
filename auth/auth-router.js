@@ -57,7 +57,7 @@ router.post('/diner/register', async (req, res, next) => {
       const response = await users.addDiner(user);
 			res.status(201).json(response);
 		} catch (error) {
-			next({ statusCode: 500, message: 'Something went wrong, try again...' });
+			next({ statusCode: 500, message: 'Something went wrong, try again...', error });
 		}
 	} else {
 		next({ statusCode: 400, message: 'Missing Registration Data.' });
@@ -75,7 +75,7 @@ router.post('/operator/register', async (req, res, next) => {
 			const response = await users.addOperator(user);
 			res.status(201).json(response);
 		} catch (error) {
-			next({ statusCode: 500, message: 'Something went wrong, try again...' });
+			next({ statusCode: 500, message: 'Something went wrong, try again...', error });
 		}
 	} else {
 		next({ statusCode: 400, message: 'Missing Registration Data.' });
@@ -86,7 +86,7 @@ router.get('/', (req, res, next) => {
   try {
     
   } catch (error) {
-    next({ statusCode: 500, message: 'Something went wrong, try again...' })
+    next({ statusCode: 500, message: 'Something went wrong, try again...', error })
   }
 })
 
