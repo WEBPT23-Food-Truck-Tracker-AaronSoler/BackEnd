@@ -65,3 +65,98 @@
 | rating | integer  | _required_                          |
 
 
+#### POST /api/diner/register
+
+request data:
+
+```json
+{
+  "email": "username@email.com",
+  "password": "password",
+  "username": "Name",
+  "first_name: "First Name",
+  "last_name": "Last Name"
+}
+```
+
+response data:
+
+```json
+{
+    "id": 1,
+    "username": "username",
+    "password": "hashed password",
+    "email": "someone@email.com",
+    "first_name": "first name",
+    "last_name": "last name"
+}
+
+```
+
+#### POST api/diner/login
+
+request data:
+
+```json
+{
+  "username": "username",
+  "password": "password"
+}
+```
+
+response data:
+
+```json
+{
+    "message": "Welcome, ${username}",
+    "token": "really.long.token"
+}
+```
+
+#### POST /api/operator/register
+
+request data:
+
+```json
+{
+  "email": "username@email.com",
+  "password": "password",
+  "username": "Name",
+  "first_name: "First Name",
+  "last_name": "Last Name"
+}
+```
+
+response data:
+
+```json
+{
+    "id": 1,
+    "username": "username",
+    "password": "hashed password",
+    "email": "someone@email.com",
+    "first_name": "first name",
+    "last_name": "last name"
+}
+
+```
+
+#### POST api/operator/login
+
+request data:
+
+```json
+{
+  "username": "username",
+  "password": "password"
+}
+```
+
+response data:
+
+```json
+{
+    "message": "Welcome, ${username}",
+    "token": "really.long.token"
+}
+```
