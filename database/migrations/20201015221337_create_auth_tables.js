@@ -42,7 +42,7 @@ exports.up = function(knex) {
     tbl.increments('id').primary();
     tbl.integer('rating').notNullable();
     tbl.integer('truck_id').unsigned().references('id').inTable('trucks').notNullable()
-    tbl.integer('diner_id').unsigned().references('id').inTable('diner').notNullable()
+    tbl.integer('diner_id').unsigned().references('id').inTable('diners').notNullable()
   })
 };
 
