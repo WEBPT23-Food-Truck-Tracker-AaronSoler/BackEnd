@@ -82,9 +82,12 @@ router.post('/operator/register', async (req, res, next) => {
 	}
 });
 
-router.get('/', (req, res, next) => {
+//For Testing
+router.get('/', async (req, res, next) => {
   try {
-    
+		const diners = await users.getDiners();
+		const operators = await users.getOperators()
+		res.status(200).json({diners, operators})
   } catch (error) {
     next({ statusCode: 500, message: 'Something went wrong, try again...', error })
   }
