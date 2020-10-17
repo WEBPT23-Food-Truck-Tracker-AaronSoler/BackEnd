@@ -1,5 +1,13 @@
 const db = require('../database/dbConfig');
 
+const getDiners = () => {
+	return db('diners');
+}
+
+const getOperators = () => {
+	return db('operators');
+}
+
 const findDinerById = (id) => {
 	return db('diners').where({ id }).first();
 };
@@ -10,7 +18,6 @@ const findOperatorById = (id) => {
 
 const addDiner = async (user) => {
 	try {
-		console.log('Add Diner')
 		const [id] = await db('diners').insert(user);
 		return findDinerById(id);
 	} catch (error) {
@@ -41,5 +48,7 @@ module.exports = {
 	addDiner,
 	addOperator,
 	findDinerByName,
-	findOperatorByName
+	findOperatorByName,
+	getDiners,
+	getOperators
 };
