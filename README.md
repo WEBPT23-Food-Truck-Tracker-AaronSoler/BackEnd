@@ -74,8 +74,8 @@ request data:
   "email": "username@email.com",
   "password": "password",
   "username": "Name",
-  "first_name: "First Name",
-  "last_name": "Last Name"
+  "first_name: "first name",
+  "last_name": "last name"
 }
 ```
 
