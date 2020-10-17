@@ -54,6 +54,7 @@ router.post('/diner/register', async (req, res, next) => {
 		user.password = hash;
 
 		try {
+
 			const response = await users.addDiner(user);
 			console.log(response);
 			res.status(201).json(response);
