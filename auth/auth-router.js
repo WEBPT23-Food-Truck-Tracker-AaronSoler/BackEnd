@@ -57,9 +57,6 @@ router.post('/diner/register', async (req, res, next) => {
 
 			const response = await users.addDiner(user);
 			console.log(response);
-      const response = await users.addDiner(user);
-			console.log(response)
-
 			res.status(201).json(response);
 		} catch (error) {
 			next({ statusCode: 500, message: 'Something went wrong, try again...', error });
