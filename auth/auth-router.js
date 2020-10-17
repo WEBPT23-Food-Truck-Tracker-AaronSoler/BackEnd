@@ -54,7 +54,8 @@ router.post('/diner/register', async (req, res, next) => {
 		user.password = hash;
 
 		try {
-      const response = await users.addDiner(user);
+			const response = await users.addDiner(user);
+			console.log(response);
 			res.status(201).json(response);
 		} catch (error) {
 			next({ statusCode: 500, message: 'Something went wrong, try again...', error });
@@ -73,6 +74,7 @@ router.post('/operator/register', async (req, res, next) => {
 
 		try {
 			const response = await users.addOperator(user);
+			console.log(response)
 			res.status(201).json(response);
 		} catch (error) {
 			next({ statusCode: 500, message: 'Something went wrong, try again...', error });
