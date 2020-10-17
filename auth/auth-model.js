@@ -18,7 +18,7 @@ const findOperatorById = (id) => {
 
 const addDiner = async (user) => {
 	try {
-		const [id] = await db('diners').insert(user);
+		const [id] = await db('diners').insert(user, 'id');
 		console.log(id);
 		return findDinerById(id);
 	} catch (error) {
@@ -28,7 +28,7 @@ const addDiner = async (user) => {
 
 const addOperator = async (user) => {
 	try {
-		const [id] = await db('operators').insert(user);
+		const [id] = await db('operators').insert(user, 'id');
 		console.log(id);
 		return findOperatorById(id);
 	} catch (error) {
