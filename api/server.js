@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const authRouter = require('../auth/auth-router');
+const dinersRouter = require('../diners/diners-router');
 const logger = require('../middleware/logger');
 const handleError = require('../middleware/handle-error-middleware');
 const restrictedRoute = require('../middleware/restricted-route-middleware')
@@ -13,6 +14,7 @@ server.use(logger())
 server.use(express.json());
 
 server.use('/api', authRouter);
+server.use('/api/restricted/diner', dinersRouter);
 
 server.get('/api/protected', restrictedRoute(), (req, res) => {
 	res.status(200).json({message: "Test -- Authorized"})
