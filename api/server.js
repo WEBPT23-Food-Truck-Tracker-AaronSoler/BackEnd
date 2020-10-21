@@ -16,11 +16,6 @@ server.use(express.json());
 server.use('/api', authRouter);
 server.use('/api/restricted/diner', dinersRouter);
 
-server.get('/api/protected', restrictedRoute(), (req, res) => {
-	res.status(200).json({message: "Test -- Authorized"})
-})
-
-
 server.use(handleError());
 server.get('/', (req, res) => {
 	res.status(200).json({ message: 'Server is Running.' });
