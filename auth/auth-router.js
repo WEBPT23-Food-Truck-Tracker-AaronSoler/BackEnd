@@ -1,155 +1,109 @@
-const router = require('express').Router();
-const bcrypt = require('bcryptjs');
+const router = require("express").Router();
+const bcrypt = require("bcryptjs");
 
+const { isValidRegistration, isValidLogin } = require("./validUser");
+const users = require("./auth-model");
+const generateToken = require("./generate_token");
 
-const { isValidRegistration, isValidLogin } = require('./validUser');
-const users = require('./auth-model');
-const generateToken = require('./generate_token');
+router.post("/diner/login", async (req, res, next) => {
+  const { username, password } = req.body;
 
-router.post('/diner/login', async (req, res, next) => {
-	const { username, password } = req.body;
-
-	if (isValidLogin(req.body)) {
-		try {
-			const user = await users.findDinerByName(username);
-			if (user && bcrypt.compareSync(password, user.password)) {
-				const token = generateToken(user);
-				res.status(200).json({ message: `Welcome, ${username}`, token });
-			} else {
-				next({ statusCode: 401, message: 'Invalid Credentials' });
-			}
-		} catch (error) {
-			next({ statusCode: 500, message: 'Something went wrong...', error });
-		}
-	} else {
-		next({ statusCode: 400, message: 'Missing Login Data.' });
-	}
-});
-
-router.post('/operator/login', async (req, res, next) => {
-	const { username, password } = req.body;
-
-	if (isValidLogin(req.body)) {
-		try {
-			const user = await users.findOperatorByName(username);
-			if (user && bcrypt.compareSync(password, user.password)) {
-				const token = generateToken(user);
-				res.status(200).json({ message: `Welcome, ${username}`, token });
-			} else {
-				next({ statusCode: 401, message: 'Invalid Credentials' });
-			}
-		} catch (error) {
-			next({ statusCode: 500, message: 'Something went wrong...', error });
-		}
-	} else {
-		next({ statusCode: 400, message: 'Missing Login Data.' });
-	}
-});
-
-router.post('/diner/register', async (req, res, next) => {
-	const user = req.body;
-	if (isValidRegistration(user)) {
-		const rounds = parseInt(process.env.ROUNDS);
-		const hash = bcrypt.hashSync(user.password, rounds || 8);
-		user.password = hash;
-
-		try {
-
-			const response = await users.addDiner(user);
-			console.log(response);
-			res.status(201).json(response);
-		} catch (error) {
-			next({ statusCode: 500, message: 'Something went wrong, try again...', error });
-		}
-	} else {
-		next({ statusCode: 400, message: 'Missing Registration Data.' });
-	}
-});
-
-router.post('/operator/register', async (req, res, next) => {
-	const user = req.body;
-	if (isValidRegistration(user)) {
-		const rounds = parseInt(process.env.ROUNDS);
-		const hash = bcrypt.hashSync(user.password, rounds || 8);
-		user.password = hash;
-
-		try {
-			const response = await users.addOperator(user);
-			console.log(response)
-			res.status(201).json(response);
-		} catch (error) {
-			next({ statusCode: 500, message: 'Something went wrong, try again...', error });
-		}
-	} else {
-		next({ statusCode: 400, message: 'Missing Registration Data.' });
-	}
-});
-
-//For Testing
-router.get('/', async (req, res, next) => {
-  try {
-		const diners = await users.getDiners();
-		const operators = await users.getOperators()
-		res.status(200).json({diners, operators})
-  } catch (error) {
-    next({ statusCode: 500, message: 'Something went wrong, try again...', error })
+  if (isValidLogin(req.body)) {
+    try {
+      const user = await users.findDinerByName(username);
+      if (user && bcrypt.compareSync(password, user.password)) {
+        const token = generateToken(user);
+        res.status(200).json({ message: `Welcome, ${username}`, token });
+      } else {
+        next({ statusCode: 401, message: "Invalid Credentials" });
+      }
+    } catch (error) {
+      next({ statusCode: 500, message: "Something went wrong...", error });
+    }
+  } else {
+    next({ statusCode: 400, message: "Missing Login Data." });
   }
 });
 
-router.get('operator/:id', (req, res) => {
-	const { id } = req.params;
-  
-	Schemes.findById(id)
-	.then(scheme => {
-	  if (scheme) {
-		res.json(scheme);
-	  } else {
-		res.status(404).json({ message: 'Could not find scheme with given id.' })
-	  }
-	})
-	.catch(err => {
-	  res.status(500).json({ message: 'Failed to get schemes' });
-	});
-  });
+router.post("/operator/login", async (req, res, next) => {
+  const { username, password } = req.body;
 
+  if (isValidLogin(req.body)) {
+    try {
+      const user = await users.findOperatorByName(username);
+      if (user && bcrypt.compareSync(password, user.password)) {
+        const token = generateToken(user);
+        res.status(200).json({ message: `Welcome, ${username}`, token });
+      } else {
+        next({ statusCode: 401, message: "Invalid Credentials" });
+      }
+    } catch (error) {
+      next({ statusCode: 500, message: "Something went wrong...", error });
+    }
+  } else {
+    next({ statusCode: 400, message: "Missing Login Data." });
+  }
+});
 
+router.post("/diner/register", async (req, res, next) => {
+  const user = req.body;
+  if (isValidRegistration(user)) {
+    const rounds = parseInt(process.env.ROUNDS);
+    const hash = bcrypt.hashSync(user.password, rounds || 8);
+    user.password = hash;
 
-router.put('/:id', (req, res) => {
-	const { id } = req.params;
-	const changes = req.body;
-  
-	Schemes.findById(id)
-	.then(scheme => {
-	  if (scheme) {
-		Schemes.update(changes, id)
-		.then(updatedScheme => {
-		  res.json(updatedScheme);
-		});
-	  } else {
-		res.status(404).json({ message: 'Could not find scheme with given id' });
-	  }
-	})
-	.catch (err => {
-	  res.status(500).json({ message: 'Failed to update scheme' });
-	});
-  });
-  
-  router.delete('/:id', (req, res) => {
-	const { id } = req.params;
-  
-	Schemes.remove(id)
-	.then(deleted => {
-	  if (deleted) {
-		res.json({ removed: deleted });
-	  } else {
-		res.status(404).json({ message: 'Could not find scheme with given id' });
-	  }
-	})
-	.catch(err => {
-	  res.status(500).json({ message: 'Failed to delete scheme' });
-	});
-  });
+    try {
+      const response = await users.addDiner(user);
+      console.log(response);
+      res.status(201).json(response);
+    } catch (error) {
+      next({
+        statusCode: 500,
+        message: "Something went wrong, try again...",
+        error,
+      });
+    }
+  } else {
+    next({ statusCode: 400, message: "Missing Registration Data." });
+  }
+});
 
+router.post("/operator/register", async (req, res, next) => {
+  const user = req.body;
+  if (isValidRegistration(user)) {
+    const rounds = parseInt(process.env.ROUNDS);
+    const hash = bcrypt.hashSync(user.password, rounds || 8);
+    user.password = hash;
 
+    try {
+      const response = await users.addOperator(user);
+      console.log(response);
+      res.status(201).json(response);
+    } catch (error) {
+      next({
+        statusCode: 500,
+        message: "Something went wrong, try again...",
+        error,
+      });
+    }
+  } else {
+    next({ statusCode: 400, message: "Missing Registration Data." });
+  }
+});
+
+//For Testing
+router.get("/", async (req, res, next) => {
+  try {
+    const diners = await users.getDiners();
+    const operators = await users.getOperators();
+    res.status(200).json({ diners, operators });
+  } catch (error) {
+    next({
+      statusCode: 500,
+      message: "Something went wrong, try again...",
+      error,
+    });
+  }
+});
 
 module.exports = router;
