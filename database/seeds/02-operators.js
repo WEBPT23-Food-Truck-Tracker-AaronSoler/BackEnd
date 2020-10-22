@@ -17,5 +17,21 @@ exports.seed = function(knex) {
             first_name: "John",
             last_name: "Doe"
         },
+          {
+            id: 3,
+            username: "user3",
+            password: "$2a$10$h79vCIgeEeRKPFQxlLhljuMYNCJRmfXh4KtlldVWOQURNnKkAYrI6",
+            email: "someone3@email.com",
+            first_name: "John",
+            last_name: "Doe"
+        },
+          {
+            id: 4,
+            username: "user4",
+            password: "$2a$10$h79vCIgeEeRKPFQxlLhljuMYNCJRmfXh4KtlldVWOQURNnKkAYrI6",
+            email: "someone4@email.com",
+            first_name: "John",
+            last_name: "Doe"
+        },
       ]);
 };

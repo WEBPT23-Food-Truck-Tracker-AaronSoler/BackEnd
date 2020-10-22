@@ -172,9 +172,9 @@ response data:
 }
 ```
 
-#### GET api/restricted/diner/:userId/dashboard?radius=1
+#### GET api/restricted/diner/:userId/dashboard?radius=1&favorites=boolean
 
-Radius should be plus 1 for each half mile of distance, ie 1 = .5 mile, 2 = 1 mile, 3 = 1.5 miles, etc.
+Radius should be plus 1 for each half mile of distance, ie 1 = .5 mile, 2 = 1 mile, 3 = 1.5 miles, etc. can return favorite trucks only by setting favorites query param to true;
 request data:
 
 response data:
@@ -205,7 +205,7 @@ response data:
 #### PUT api/restricted/diner/:userId
 
 request data:
-Only the fields being changed need to be sent... changed passwords will be automatically rehashed.
+Edit Diner info. Only the fields being changed need to be sent... changed passwords will be automatically rehashed.
 
 ```json
 {
@@ -232,6 +232,267 @@ response data:
 		"first_name": "Jonny",
 		"last_name": "Doe",
 		"current_location": "{\"longitude\":-74.00909759,\"latitude\":40.71789583}"
+	}
+}
+```
+
+#### DELETE api/restricted/diner/:userId
+
+Delete Diner Account
+
+response data:
+
+```json
+{
+	"message": "Delete-- Success!",
+	"data": {
+		"id": 1,
+		"username": "user1",
+		"password": "$2a$10$yVd8d4eU0dJT1XgByHsEdus3LUUCAzAxJ59USc/6MgYPPgrY2zNMK",
+		"email": "someone@email.com",
+		"first_name": "Jonny",
+		"last_name": "Doe",
+		"current_location": "{\"longitude\":-74.00909759,\"latitude\":40.71789583}"
+	}
+}
+```
+
+#### GET api/restricted/diner/:userId/truck
+
+Get a list of Diners Ratings of trucks
+
+response data:
+
+```json
+[
+	{
+		"id": 3,
+		"rating": 2,
+		"truck_id": 1,
+		"diner_id": 2
+	},
+	{
+		"id": 4,
+		"rating": 4,
+		"truck_id": 2,
+		"diner_id": 1
+	}
+]
+```
+
+#### POST api/restricted/diner/:userId/truck
+
+request data:
+Add a Diners rating for a truck
+
+```json
+{
+	"rating": 4,
+	"truck_id": 1
+}
+```
+
+response data:
+
+```json
+{
+	"id": 4,
+	"rating": 4,
+	"truck_id": 1,
+	"diner_id": 2
+}
+```
+
+#### DELETE api/restricted/diner/:ratingId/truck
+
+Delete a single Rating for a Truck.
+
+response data:
+
+```json
+{
+	"message": "Deleted Rating -- Success!",
+	"data": [
+		{
+			"id": 4,
+			"rating": 4,
+			"truck_id": 1,
+			"diner_id": 2
+		}
+	]
+}
+```
+
+#### PUT api/restricted/diner/:ratingId/truck
+
+request data:
+Edit Truck Rating info. Only the fields being changed need to be sent... changed passwords will be automatically rehashed.
+
+```json
+{
+	"rating": 2
+}
+```
+
+response data:
+
+```json
+{
+	"message": "Edited Rating -- Success!",
+	"data": {
+		"id": 3,
+		"rating": 2,
+		"truck_id": 1,
+		"diner_id": 2
+	}
+}
+```
+
+#### GET api/restricted/diner/:userId/menuitem
+
+Get a list of Diners Ratings of menu items
+
+response data:
+
+```json
+[
+	{
+		"id": 3,
+		"rating": 2,
+		"menu_item_id": 1,
+		"diner_id": 2
+	},
+	{
+		"id": 4,
+		"rating": 4,
+		"menu_item_id": 2,
+		"diner_id": 1
+	}
+]
+```
+
+#### POST api/restricted/diner/:userId/menuitem
+
+request data:
+Add a Diners rating for a menu item
+
+```json
+{
+	"rating": 4,
+	"menu_item_id": 1
+}
+```
+
+response data:
+
+```json
+{
+	"id": 4,
+	"rating": 4,
+	"menu_item_id": 1,
+	"diner_id": 2
+}
+```
+
+#### DELETE api/restricted/diner/:ratingId/menuitem
+
+Delete a single Rating for a menu item.
+
+response data:
+
+```json
+{
+	"message": "Deleted Rating -- Success!",
+	"data": [
+		{
+			"id": 4,
+			"rating": 4,
+			"truck_id": 1,
+			"menu_item_id": 2
+		}
+	]
+}
+```
+
+#### PUT api/restricted/diner/:ratingId/menuitem
+
+request data:
+Edit Menu item Rating info.
+
+```json
+{
+	"rating": 4
+}
+```
+
+response data:
+
+```json
+{
+	"message": "Edited Rating -- Success!",
+	"data": {
+		"id": 3,
+		"rating": 4,
+		"truck_id": 1,
+		"diner_id": 2
+	}
+}
+```
+
+#### GET api/restricted/diner/:userId/favoritetrucks
+
+get a list of a diners favorite trucks.
+
+response data:
+
+```json
+[
+	{
+		"id": 1,
+		"truck_id": 1,
+		"diner_id": 2
+	},
+	{
+		"id": 2,
+		"truck_id": 2,
+		"diner_id": 2
+	}
+]
+```
+
+#### POST api/restricted/diner/:userId/favoritetrucks
+
+Add a diner Favorite
+
+request data:
+
+```json
+{
+	"truck_id": 2
+}
+```
+
+response data:
+
+```json
+{
+	"id": 2,
+	"truck_id": 2,
+	"diner_id": 2
+}
+```
+
+#### DELETE api/restricted/diner/:favoriteId/favoritetrucks
+
+response data:
+
+```json
+{
+	"message": "Deleted Favorite -- Success!!",
+	"data": {
+		"id": 1,
+		"truck_id": 1,
+		"diner_id": 2
 	}
 }
 ```

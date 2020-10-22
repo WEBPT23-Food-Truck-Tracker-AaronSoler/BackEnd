@@ -1,5 +1,6 @@
 const db = require('../database/dbConfig');
 const geolib = require('geolib');
+const e = require('express');
 
 const findDinerById = (id) => {
 	return db('diners').where({ id }).first();
@@ -20,13 +21,21 @@ const deleteDiner = async (id) => {
 	return response;
 }
 
-const findLocalTrucks = async (location, distance) => {
+const findLocalTrucks = async (id, location, distance, favorites) => {
   const computedDistance = distance ? distance * 805 : 1610;
-  console.log(computedDistance);
- const trucks = await db('trucks');
+  let trucks;
+  if (favorites.toLowerCase() === 'true') {
+    console.log(typeof favorites)
+    console.log('if')
+    trucks = await db('diner_favorite_trucks').join('trucks', 'diner_favorite_trucks.truck_id', 'trucks.id').join('diners', 'diner_favorite_trucks.diner_id', 'diners.id').where('diners.id', id).select('trucks.*')
+  } else {
+    console.log('else')
+    trucks = await db('trucks');
+  }
+  
  const localTrucks = trucks.filter(truck => {
    let truckLocation = JSON.parse(truck.location)
-   console.log(geolib.getDistance(location, truckLocation))
+  //  console.log(geolib.getDistance(location, truckLocation))
    if (geolib.getDistance(location, truckLocation) <= computedDistance) {
      return truck
    } 
@@ -82,6 +91,21 @@ const editMenuItemRating = async (id, changes) => {
   return getMenuItemRatingById(id);
 }
 
+const getFavoriteTrucks = (userId) => {
+  return db('diner_favorite_trucks').where({diner_id: userId})
+}
+
+const addFavoriteTruck = async (truckId, dinerId) => {
+  const [id] = await db('diner_favorite_trucks').insert({truck_id: truckId, diner_id: dinerId}, 'id');
+  return db('diner_favorite_trucks').where({id}).first();
+}
+
+const deleteFavoriteTruck = async (id) => {
+  const response = await db('diner_favorite_trucks').where({id}).first();
+  await db('diner_favorite_trucks').where({id}).del();
+  return response;
+}
+
 
 module.exports = {
   findDinerById,
@@ -97,5 +121,8 @@ module.exports = {
   addMenuItemRating,
   deleteMenuItemRating,
   editMenuItemRating,
-  getDinerMenuItemRatings
+  getDinerMenuItemRatings,
+  addFavoriteTruck,
+  deleteFavoriteTruck,
+  getFavoriteTrucks
 }

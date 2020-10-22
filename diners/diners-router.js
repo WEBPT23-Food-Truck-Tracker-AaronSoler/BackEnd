@@ -2,14 +2,16 @@ const router = require('express').Router();
 const diner = require('./diners-model');
 const bcrypt = require('bcryptjs');
 
-// Returns trucks within 2 miles of users location
+// Returns trucks within .5 miles or supplied distance of users location. Add query string favorites=true to get back list of favorite trucks
 router.get('/:userId/dashboard', async (req, res, next) => {
   const id = req.params.userId;
   const distance = req.query.radius;
+  const favorites = req.query.favorites;
+
   try {
   const {current_location} = await diner.findDinerById(id);
   const location = JSON.parse(current_location);
-  const response = await diner.findLocalTrucks(location, distance);
+  const response = await diner.findLocalTrucks(id, location, distance, favorites);
   
   res.status(200).json(response)
   } catch (error) {
@@ -88,6 +90,7 @@ router.delete('/:ratingId/truck', async (req, res, next) => {
     next({statusCode: 500, message: 'Something went wrong with the server, try again!', error})
   }
 })
+
 //Edit Truck Rating
 router.put('/:ratingId/truck', async (req, res, next) => {
   const id = req.params.ratingId;
@@ -145,6 +148,40 @@ router.put('/:ratingId/menuitem', async (req, res, next) => {
     res.status(200).json({message: 'Edited Rating -- Success!', data: response})
   } catch (error) {
     next({statusCode: 500, message: 'Something went wrong with the server, try again!', error})
+  }
+});
+
+//Get favorite trucks of a Diner
+router.get('/:userId/favoritetrucks', async (req, res, next) => {
+  const id = req.params.userId;
+  try {
+    const response = await diner.getFavoriteTrucks(id);
+    res.status(200).json(response);
+  } catch (error) {
+      next({statusCode: 500, message: 'Something went wrong with the server, try again!', error})
+  }
+})
+//Add Truck to Favorites
+router.post('/:userId/favoritetrucks', async (req, res, next) => {
+  const userId = req.params.userId;
+  const truckId = req.body.truck_id;
+  try {
+    const response = await diner.addFavoriteTruck(truckId, userId);
+    res.status(201).json(response);
+  } catch (error) {
+      next({statusCode: 500, message: 'Something went wrong with the server, try again!', error})
+  }
+})
+
+//Delete a truck from favorites
+router.delete('/:favoriteId/favoritetrucks', async (req, res, next) => {
+  const id = req.params.favoriteId;
+  try {
+    const response = await diner.deleteFavoriteTruck(id);
+    res.status(200).json({message: "Deleted Favorite -- Success!!", data: response})
+  } catch (error) {
+      next({statusCode: 500, message: 'Something went wrong with the server, try again!', error})
+
   }
 })
 
