@@ -14,7 +14,7 @@ server.use(logger())
 server.use(express.json());
 
 server.use('/api', authRouter);
-server.use('/api/restricted/diner', dinersRouter);
+server.use('/api/restricted/diner', restrictedRoute(), dinersRouter);
 
 server.use(handleError());
 server.get('/', (req, res) => {

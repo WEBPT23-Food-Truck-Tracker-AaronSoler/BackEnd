@@ -12,7 +12,9 @@ router.post('/diner/login', async (req, res, next) => {
 
 	if (isValidLogin(req.body)) {
 		try {
-			await diners.updateDiner({current_location: JSON.stringify(location)}, username)
+			if (location) {
+				await diners.updateDiner({current_location: JSON.stringify(location)}, username)
+			}
 			const user = await users.findDinerByName(username);
 			if (user && bcrypt.compareSync(password, user.password)) {
 				const token = generateToken(user);
