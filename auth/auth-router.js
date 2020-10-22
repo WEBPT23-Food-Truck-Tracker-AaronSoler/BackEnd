@@ -94,6 +94,62 @@ router.get('/', async (req, res, next) => {
   } catch (error) {
     next({ statusCode: 500, message: 'Something went wrong, try again...', error })
   }
-})
+});
+
+router.get('operator/:id', (req, res) => {
+	const { id } = req.params;
+  
+	Schemes.findById(id)
+	.then(scheme => {
+	  if (scheme) {
+		res.json(scheme);
+	  } else {
+		res.status(404).json({ message: 'Could not find scheme with given id.' })
+	  }
+	})
+	.catch(err => {
+	  res.status(500).json({ message: 'Failed to get schemes' });
+	});
+  });
+
+
+
+router.put('/:id', (req, res) => {
+	const { id } = req.params;
+	const changes = req.body;
+  
+	Schemes.findById(id)
+	.then(scheme => {
+	  if (scheme) {
+		Schemes.update(changes, id)
+		.then(updatedScheme => {
+		  res.json(updatedScheme);
+		});
+	  } else {
+		res.status(404).json({ message: 'Could not find scheme with given id' });
+	  }
+	})
+	.catch (err => {
+	  res.status(500).json({ message: 'Failed to update scheme' });
+	});
+  });
+  
+  router.delete('/:id', (req, res) => {
+	const { id } = req.params;
+  
+	Schemes.remove(id)
+	.then(deleted => {
+	  if (deleted) {
+		res.json({ removed: deleted });
+	  } else {
+		res.status(404).json({ message: 'Could not find scheme with given id' });
+	  }
+	})
+	.catch(err => {
+	  res.status(500).json({ message: 'Failed to delete scheme' });
+	});
+  });
+
+
 
 module.exports = router;
