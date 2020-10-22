@@ -7,11 +7,12 @@ router.get('/:userId/dashboard', async (req, res, next) => {
   const id = req.params.userId;
   const distance = req.query.radius;
   const favorites = req.query.favorites;
+  const cuisineType = req.query.cuisine;
 
   try {
   const {current_location} = await diner.findDinerById(id);
   const location = JSON.parse(current_location);
-  const response = await diner.findLocalTrucks(id, location, distance, favorites);
+  const response = await diner.findLocalTrucks(id, location, distance, favorites, cuisineType);
   
   res.status(200).json(response)
   } catch (error) {

@@ -1,6 +1,6 @@
 const db = require('../database/dbConfig');
 const geolib = require('geolib');
-const e = require('express');
+
 
 const findDinerById = (id) => {
 	return db('diners').where({ id }).first();
@@ -19,28 +19,6 @@ const deleteDiner = async (id) => {
   const response = await findDinerById(id);
 	await db('diners').where({ id }).del();
 	return response;
-}
-
-const findLocalTrucks = async (id, location, distance, favorites) => {
-  const computedDistance = distance ? distance * 805 : 1610;
-  let trucks;
-  if (favorites.toLowerCase() === 'true') {
-    console.log(typeof favorites)
-    console.log('if')
-    trucks = await db('diner_favorite_trucks').join('trucks', 'diner_favorite_trucks.truck_id', 'trucks.id').join('diners', 'diner_favorite_trucks.diner_id', 'diners.id').where('diners.id', id).select('trucks.*')
-  } else {
-    console.log('else')
-    trucks = await db('trucks');
-  }
-  
- const localTrucks = trucks.filter(truck => {
-   let truckLocation = JSON.parse(truck.location)
-  //  console.log(geolib.getDistance(location, truckLocation))
-   if (geolib.getDistance(location, truckLocation) <= computedDistance) {
-     return truck
-   } 
- })
- return localTrucks;
 }
 
 const getTruckRatingById = (id) => {
@@ -92,7 +70,7 @@ const editMenuItemRating = async (id, changes) => {
 }
 
 const getFavoriteTrucks = (userId) => {
-  return db('diner_favorite_trucks').where({diner_id: userId})
+  return db('diner_favorite_trucks').join('trucks', 'diner_favorite_trucks.truck_id', 'trucks.id').join('diners', 'diner_favorite_trucks.diner_id', 'diners.id').where('diners.id', userId).select('trucks.*')
 }
 
 const addFavoriteTruck = async (truckId, dinerId) => {
@@ -104,6 +82,32 @@ const deleteFavoriteTruck = async (id) => {
   const response = await db('diner_favorite_trucks').where({id}).first();
   await db('diner_favorite_trucks').where({id}).del();
   return response;
+}
+
+const findLocalTrucks = async (id, location, distance, favorites, cuisineType) => {
+  const computedDistance = distance ? distance * 805 : 1610;
+  let trucks;
+  if (favorites.toLowerCase() === 'true') {
+    trucks = await getFavoriteTrucks(id)
+  } else {
+    trucks = await db('trucks');
+  }
+
+  if (cuisineType) {
+    trucks = trucks.filter(truck => {
+      if (truck.cuisine_type.toLowerCase() === cuisineType.toLowerCase()) {
+        return truck;
+      }
+    })
+  }
+  
+ const localTrucks = trucks.filter(truck => {
+   let truckLocation = JSON.parse(truck.location)
+   if (geolib.getDistance(location, truckLocation) <= computedDistance) {
+     return truck
+   } 
+ })
+ return localTrucks;
 }
 
 
