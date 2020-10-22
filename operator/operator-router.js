@@ -12,7 +12,7 @@ router.put("/:userId", async (req, res, next) => {
   }
   if (id && changes) {
     try {
-      const response = await diner.updateOperator(changes, id);
+      const response = await operator.updateOperator(changes, id);
       res.status(200).json({ message: "Update-- Success!", data: response });
     } catch (error) {
       next({
@@ -30,7 +30,7 @@ router.delete("/:userId", async (req, res, next) => {
   const id = req.params.userId;
   if (id) {
     try {
-      const response = await diner.deleteOperator(id);
+      const response = await operator.deleteOperator(id);
       res.status(200).json({ message: "Delete-- Success!", data: response });
     } catch (error) {
       next({
@@ -55,6 +55,54 @@ router.get("/:userId/dashboard", async (req, res, next) => {
       message: "Something went wrong with the server, try again!",
       error,
     });
+  }
+});
+
+router.post("/:userId/truck", async (req, res, next) => {
+  const userId = req.params.userId;
+  const body = req.body;
+  try {
+    const response = await operator.addTruck(userId, body);
+    res.status(201).json(response);
+  } catch (error) {
+    next({
+      statusCode: 500,
+      message: "Something went wrong with the server, try again!",
+      error,
+    });
+  }
+});
+
+router.put("/:truckId/truck", async (req, res, next) => {
+  const truckId = req.params.truckId;
+  const changes = req.body;
+  try {
+    const response = await operator.editTruck(truckId, changes);
+    res.status(201).json(response);
+  } catch (error) {
+    next({
+      statusCode: 500,
+      message: "Something went wrong with the server, try again!",
+      error,
+    });
+  }
+});
+
+router.delete("/:truckId/truck", async (req, res, next) => {
+  const id = req.params.truckId;
+  if (id) {
+    try {
+      const response = await operator.deleteOperator(id);
+      res.status(200).json({ message: "Delete-- Success!", data: response });
+    } catch (error) {
+      next({
+        statusCode: 500,
+        message: "Something went wrong with the server, try again!",
+        error,
+      });
+    }
+  } else {
+    next({ statusCode: 400, message: "Missing ID, try again!", error });
   }
 });
 
