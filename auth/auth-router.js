@@ -12,9 +12,11 @@ router.post('/diner/login', async (req, res, next) => {
 	if (isValidLogin(req.body)) {
 		try {
 			if (location) {
+				const user = await diners.findDinerByName(username);
+				console.log(user.id);
 				await diners.updateDiner(
 					{ current_location: JSON.stringify(location) },
-					username
+					user.id
 				);
 			}
 			const user = await users.findDinerByName(username);
