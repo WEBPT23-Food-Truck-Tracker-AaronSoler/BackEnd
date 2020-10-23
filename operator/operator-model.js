@@ -37,6 +37,34 @@ const deleteTruck = async (id) => {
   return response;
 };
 
+const getDinerMenuItem = async (id) => {
+  return db("menu_items").where({ id });
+};
+
+const addMenuItem = async (truckid, body) => {
+  const [id] = await db("menu_items").insert(
+    {
+      item_name: body.item_name,
+      item_description: body.item_description,
+      item_price: body.item_price,
+      truck_id: truckid,
+    },
+    "id"
+  );
+  return getMenuItemById(id);
+};
+
+const editMenuItem = async (id, changes) => {
+  await db("menu_items").where({ id }).update(changes);
+  return getMenuItemById(id);
+};
+
+const deleteMenuItem = async (id) => {
+  const response = await db("menu_items").where({ id });
+  await db("menu_items").where({ id }).del();
+  return response;
+};
+
 module.exports = {
   findOperatorTrucks,
   updateOperator,
@@ -44,4 +72,8 @@ module.exports = {
   addTruck,
   editTruck,
   deleteTruck,
+  getDinerMenuItem,
+  addMenuItem,
+  editMenuItem,
+  deleteMenuItem,
 };

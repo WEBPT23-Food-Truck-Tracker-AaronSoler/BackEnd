@@ -58,6 +58,7 @@ router.get("/:userId/dashboard", async (req, res, next) => {
   }
 });
 
+//trucks
 router.post("/:userId/truck", async (req, res, next) => {
   const userId = req.params.userId;
   const body = req.body;
@@ -93,6 +94,69 @@ router.delete("/:truckId/truck", async (req, res, next) => {
   if (id) {
     try {
       const response = await operator.deleteOperator(id);
+      res.status(200).json({ message: "Delete-- Success!", data: response });
+    } catch (error) {
+      next({
+        statusCode: 500,
+        message: "Something went wrong with the server, try again!",
+        error,
+      });
+    }
+  } else {
+    next({ statusCode: 400, message: "Missing ID, try again!", error });
+  }
+});
+
+//menu items
+router.get("/:menuitemID/item", async (req, res, next) => {
+  const id = req.params.menuitemId;
+  try {
+    const response = await operator.getDinerMenuItem(id);
+    res.status(200).json(response);
+  } catch (error) {
+    next({
+      statusCode: 500,
+      message: "Something went wrong with the server, try again!",
+      error,
+    });
+  }
+});
+
+router.post("/:truckId/item", async (req, res, next) => {
+  const body = req.body;
+  const id = req.params.truckId;
+  try {
+    const response = await operator.addMenuItem(id, body);
+    res.status(201).json(response);
+  } catch (error) {
+    next({
+      statusCode: 500,
+      message: "Something went wrong with the server, try again!",
+      error,
+    });
+  }
+});
+
+router.put("/:menuitemId/item", async (req, res, next) => {
+  const id = req.params.menuitemId;
+  const changes = req.body;
+  try {
+    const response = await operator.editMenuItem(id, changes);
+    res.status(201).json(response);
+  } catch (error) {
+    next({
+      statusCode: 500,
+      message: "Something went wrong with the server, try again!",
+      error,
+    });
+  }
+});
+
+router.delete("/:menuitemId/item", async (req, res, next) => {
+  const id = req.params.menuitemID;
+  if (id) {
+    try {
+      const response = await operator.deleteMenuItem(id);
       res.status(200).json({ message: "Delete-- Success!", data: response });
     } catch (error) {
       next({
