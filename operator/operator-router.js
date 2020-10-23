@@ -108,8 +108,8 @@ router.delete("/:truckId/truck", async (req, res, next) => {
 });
 
 //menu items
-router.get("/:menuitemID/item", async (req, res, next) => {
-  const id = req.params.menuitemId;
+router.get("/:truckId/item", async (req, res, next) => {
+  const id = req.params.truckId;
   try {
     const response = await operator.getDinerMenuItem(id);
     res.status(200).json(response);
@@ -124,7 +124,8 @@ router.get("/:menuitemID/item", async (req, res, next) => {
 
 router.post("/:truckId/item", async (req, res, next) => {
   const body = req.body;
-  const id = req.params.truckId;
+  console.log(body);
+  const id = JSON.parse(req.params.truckId);
   try {
     const response = await operator.addMenuItem(id, body);
     res.status(201).json(response);
@@ -153,7 +154,7 @@ router.put("/:menuitemId/item", async (req, res, next) => {
 });
 
 router.delete("/:menuitemId/item", async (req, res, next) => {
-  const id = req.params.menuitemID;
+  const id = req.params.menuitemId;
   if (id) {
     try {
       const response = await operator.deleteMenuItem(id);

@@ -37,7 +37,7 @@ const deleteTruck = async (id) => {
   return response;
 };
 
-const getDinerMenuItem = async (id) => {
+const getMenuItemById = async (id) => {
   return db("menu_items").where({ id });
 };
 
@@ -72,7 +72,7 @@ module.exports = {
   addTruck,
   editTruck,
   deleteTruck,
-  getDinerMenuItem,
+  getMenuItemById,
   addMenuItem,
   editMenuItem,
   deleteMenuItem,
