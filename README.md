@@ -172,9 +172,9 @@ response data:
 }
 ```
 
-#### GET api/restricted/diner/:userId/dashboard?radius=1&favorites=boolean
+#### GET api/restricted/diner/:userId/dashboard?radius=1&favorites=boolean&cuisine=string
 
-Radius should be plus 1 for each half mile of distance, ie 1 = .5 mile, 2 = 1 mile, 3 = 1.5 miles, etc. can return favorite trucks only by setting favorites query param to true;
+Radius should be plus 1 for each half mile of distance, ie 1 = .5 mile, 2 = 1 mile, 3 = 1.5 miles, etc. can return favorite trucks only by setting favorites query param to true; Can also limit to a single cuisine type with query cuisine=string.
 request data:
 
 response data:
@@ -449,13 +449,30 @@ response data:
 [
 	{
 		"id": 1,
-		"truck_id": 1,
-		"diner_id": 2
+		"truck_name": "Pancho Villas",
+		"truck_image": null,
+		"cuisine_type": "Mexican",
+		"location": "{\"longitude\":-74.00676748,\"latitude\":40.7202806}",
+		"departure_time": null,
+		"operator_id": 1
 	},
 	{
-		"id": 2,
-		"truck_id": 2,
-		"diner_id": 2
+		"id": 3,
+		"truck_name": "Jenny's Hot Franks",
+		"truck_image": null,
+		"cuisine_type": "Hot Dogs",
+		"location": "{\"longitude\":-73.99493845,\"latitude\":40.71373295}",
+		"departure_time": null,
+		"operator_id": 3
+	},
+	{
+		"id": 4,
+		"truck_name": "Taste Of Goa",
+		"truck_image": null,
+		"cuisine_type": "Indian",
+		"location": "{\"longitude\":-73.9340461,\"latitude\":40.72607474}",
+		"departure_time": null,
+		"operator_id": 4
 	}
 ]
 ```
