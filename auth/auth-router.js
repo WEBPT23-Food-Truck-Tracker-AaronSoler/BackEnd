@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 
-
 const { isValidRegistration, isValidLogin } = require('./validUser');
 const users = require('./auth-model');
 const diners = require('../diners/diners-model');
@@ -13,12 +12,17 @@ router.post('/diner/login', async (req, res, next) => {
 	if (isValidLogin(req.body)) {
 		try {
 			if (location) {
-				await diners.updateDiner({current_location: JSON.stringify(location)}, username)
+				await diners.updateDiner(
+					{ current_location: JSON.stringify(location) },
+					username
+				);
 			}
 			const user = await users.findDinerByName(username);
 			if (user && bcrypt.compareSync(password, user.password)) {
 				const token = generateToken(user);
-				res.status(200).json({ message: `Welcome, ${username}`, id: user.id, token });
+				res
+					.status(200)
+					.json({ message: `Welcome, ${username}`, id: user.id, token });
 			} else {
 				next({ statusCode: 401, message: 'Invalid Credentials' });
 			}
@@ -38,7 +42,9 @@ router.post('/operator/login', async (req, res, next) => {
 			const user = await users.findOperatorByName(username);
 			if (user && bcrypt.compareSync(password, user.password)) {
 				const token = generateToken(user);
-				res.status(200).json({ message: `Welcome, ${username}`, id: user.id, token });
+				res
+					.status(200)
+					.json({ message: `Welcome, ${username}`, id: user.id, token });
 			} else {
 				next({ statusCode: 401, message: 'Invalid Credentials' });
 			}
@@ -58,12 +64,14 @@ router.post('/diner/register', async (req, res, next) => {
 		user.password = hash;
 
 		try {
-
 			const response = await users.addDiner(user);
-			console.log(response);
 			res.status(201).json(response);
 		} catch (error) {
-			next({ statusCode: 500, message: 'Something went wrong, try again...', error });
+			next({
+				statusCode: 500,
+				message: 'Something went wrong, try again...',
+				error,
+			});
 		}
 	} else {
 		next({ statusCode: 400, message: 'Missing Registration Data.' });
@@ -79,10 +87,13 @@ router.post('/operator/register', async (req, res, next) => {
 
 		try {
 			const response = await users.addOperator(user);
-			console.log(response)
 			res.status(201).json(response);
 		} catch (error) {
-			next({ statusCode: 500, message: 'Something went wrong, try again...', error });
+			next({
+				statusCode: 500,
+				message: 'Something went wrong, try again...',
+				error,
+			});
 		}
 	} else {
 		next({ statusCode: 400, message: 'Missing Registration Data.' });
@@ -91,13 +102,17 @@ router.post('/operator/register', async (req, res, next) => {
 
 //For Testing
 router.get('/', async (req, res, next) => {
-  try {
+	try {
 		const diners = await users.getDiners();
-		const operators = await users.getOperators()
-		res.status(200).json({diners, operators})
-  } catch (error) {
-    next({ statusCode: 500, message: 'Something went wrong, try again...', error })
-  }
-})
+		const operators = await users.getOperators();
+		res.status(200).json({ diners, operators });
+	} catch (error) {
+		next({
+			statusCode: 500,
+			message: 'Something went wrong, try again...',
+			error,
+		});
+	}
+});
 
 module.exports = router;
