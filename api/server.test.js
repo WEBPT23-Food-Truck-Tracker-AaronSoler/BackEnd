@@ -11,6 +11,27 @@ let diner1 = {
 	current_location: '{"longitude":-74.00909759,"latitude":40.71789583}',
 };
 
+let truck1 = {
+	cuisine_type: 'Mexican',
+	truck_name: 'Pancho Villas',
+	location: '{"longitude":-74.00676748,"latitude":40.7202806}',
+	operator_id: 1,
+};
+
+let menuItem1 = {
+	id: 1,
+	item_name: 'Nachos Con Carne',
+	item_description: 'With rare steak...',
+	item_price: 12.99,
+	truck_id: 1,
+};
+
+let truckRating1 = { id: 1, rating: 3, truck_id: 1, diner_id: 1 };
+
+let menuRating1 = { id: 1, menu_item_id: 1, diner_id: 1, rating: 3 };
+
+let favoriteTruck1 = { id: 1, truck_id: 1, diner_id: 1 };
+
 describe('server', () => {
 	it('should run in a testing environment', () => {
 		expect(process.env.DB_ENV).toBe('testing');
@@ -198,6 +219,342 @@ describe('server', () => {
 			console.log(response.status);
 			const parsedRes = JSON.parse(response.text);
 			expect(parsedRes.message).toBe('Delete-- Success!');
+		});
+	});
+
+	describe('GET /api/restricted/diner/:userId/truck', () => {
+		beforeEach(async () => {
+			await request(server).post('/api/diner/register').send(diner1);
+			await db('trucks').insert(truck1);
+			await db('diners_truck_ratings').insert(truckRating1);
+		});
+
+		it('should not allow a user without credentials access', async () => {
+			const response = await request(server).get(
+				'/api/restricted/diner/1/truck'
+			);
+			expect(response.status).toBe(401);
+		});
+
+		it('should allow a user with credentials access', async () => {
+			const login = await request(server).post('/api/diner/login').send({
+				username: diner1.username,
+				password: diner1.password,
+			});
+			const { token } = JSON.parse(login.text);
+
+			const response = await request(server)
+				.get('/api/restricted/diner/1/truck')
+				.set({ Authorization: `Bearer ${token}` });
+			const parsed = JSON.parse(response.text);
+			expect(response.status).toBe(200);
+			expect.arrayContaining(parsed.text);
+		});
+	});
+
+	describe('POST /api/restricted/diner/:userId/truck', () => {
+		beforeEach(async () => {
+			await request(server).post('/api/diner/register').send(diner1);
+			await db('trucks').insert(truck1);
+		});
+
+		it('should not allow a user without credentials access', async () => {
+			const response = await request(server)
+				.post('/api/restricted/diner/1/truck')
+				.send(truckRating1);
+			expect(response.status).toBe(401);
+		});
+
+		it('should allow a user with credentials access', async () => {
+			const login = await request(server).post('/api/diner/login').send({
+				username: diner1.username,
+				password: diner1.password,
+			});
+			const { token } = JSON.parse(login.text);
+			const response = await request(server)
+				.post('/api/restricted/diner/1/truck')
+				.set({ Authorization: `Bearer ${token}` })
+				.send(truckRating1);
+			expect(response.status).toBe(201);
+		});
+	});
+
+	describe('PUT /api/restricted/diner/:userId/truck', () => {
+		beforeEach(async () => {
+			await request(server).post('/api/diner/register').send(diner1);
+			await db('trucks').insert(truck1);
+			await db('diners_truck_ratings').insert(truckRating1);
+		});
+
+		it('should not allow a user without credentials access', async () => {
+			const response = await request(server)
+				.put('/api/restricted/diner/1/truck')
+				.send({ rating: 5 });
+			expect(response.status).toBe(401);
+		});
+
+		it('should allow a user with credentials access', async () => {
+			const login = await request(server).post('/api/diner/login').send({
+				username: diner1.username,
+				password: diner1.password,
+			});
+			const { token } = JSON.parse(login.text);
+			const response = await request(server)
+				.put('/api/restricted/diner/1/truck')
+				.set({ Authorization: `Bearer ${token}` })
+				.send({ rating: 5 });
+
+			const parsed = JSON.parse(response.text);
+			expect(response.status).toBe(200);
+			expect(parsed.message).toBe('Edited Rating -- Success!');
+			expect(parsed.data.rating).toBe(5);
+		});
+	});
+
+	describe('DELETE /api/restricted/diner/:userId/truck', () => {
+		beforeEach(async () => {
+			await request(server).post('/api/diner/register').send(diner1);
+			await db('trucks').insert(truck1);
+			await db('diners_truck_ratings').insert(truckRating1);
+		});
+
+		it('should not allow a user without credentials access', async () => {
+			const response = await request(server).delete(
+				'/api/restricted/diner/1/truck'
+			);
+			expect(response.status).toBe(401);
+		});
+
+		it('should allow a user with credentials access', async () => {
+			const login = await request(server).post('/api/diner/login').send({
+				username: diner1.username,
+				password: diner1.password,
+			});
+			const { token } = JSON.parse(login.text);
+
+			const response = await request(server)
+				.delete('/api/restricted/diner/1/truck')
+				.set({ Authorization: `Bearer ${token}` });
+			const parsed = JSON.parse(response.text);
+			expect(response.status).toBe(200);
+			expect(parsed.message).toBe('Deleted Rating -- Success!');
+		});
+	});
+
+	describe('GET /api/restricted/diner/:userId/menuitem', () => {
+		beforeEach(async () => {
+			await request(server).post('/api/diner/register').send(diner1);
+			await db('trucks').insert(truck1);
+			await db('menu_items').insert(menuItem1);
+			await db('diners_menu_items_ratings').insert(menuRating1);
+		});
+
+		it('should not allow a user without credentials access', async () => {
+			const response = await request(server).get(
+				'/api/restricted/diner/1/menuitem'
+			);
+			expect(response.status).toBe(401);
+		});
+
+		it('should allow a user with credentials access', async () => {
+			const login = await request(server).post('/api/diner/login').send({
+				username: diner1.username,
+				password: diner1.password,
+			});
+			const { token } = JSON.parse(login.text);
+
+			const response = await request(server)
+				.get('/api/restricted/diner/1/menuitem')
+				.set({ Authorization: `Bearer ${token}` });
+			const parsed = JSON.parse(response.text);
+			expect(response.status).toBe(200);
+			expect.arrayContaining(parsed.text);
+		});
+	});
+
+	describe('POST /api/restricted/diner/:userId/menuitem', () => {
+		beforeEach(async () => {
+			await request(server).post('/api/diner/register').send(diner1);
+			await db('trucks').insert(truck1);
+			await db('menu_items').insert(menuItem1);
+		});
+
+		it('should not allow a user without credentials access', async () => {
+			const response = await request(server)
+				.post('/api/restricted/diner/1/menuitem')
+				.send(menuRating1);
+			expect(response.status).toBe(401);
+		});
+
+		it('should allow a user with credentials access', async () => {
+			const login = await request(server).post('/api/diner/login').send({
+				username: diner1.username,
+				password: diner1.password,
+			});
+			const { token } = JSON.parse(login.text);
+			const response = await request(server)
+				.post('/api/restricted/diner/1/menuitem')
+				.set({ Authorization: `Bearer ${token}` })
+				.send(menuRating1);
+			expect(response.status).toBe(201);
+			const parsed = JSON.parse(response.text);
+			expect(parsed).toEqual({
+				id: 1,
+				rating: 3,
+				diner_id: 1,
+				menu_item_id: 1,
+			});
+		});
+	});
+
+	describe('PUT /api/restricted/diner/:userId/menuitem', () => {
+		beforeEach(async () => {
+			await request(server).post('/api/diner/register').send(diner1);
+			await db('trucks').insert(truck1);
+			await db('menu_items').insert(menuItem1);
+			await db('diners_menu_items_ratings').insert(menuRating1);
+		});
+
+		it('should not allow a user without credentials access', async () => {
+			const response = await request(server)
+				.put('/api/restricted/diner/1/menuitem')
+				.send({ rating: 5 });
+			expect(response.status).toBe(401);
+		});
+
+		it('should allow a user with credentials access', async () => {
+			const login = await request(server).post('/api/diner/login').send({
+				username: diner1.username,
+				password: diner1.password,
+			});
+			const { token } = JSON.parse(login.text);
+			const response = await request(server)
+				.put('/api/restricted/diner/1/menuitem')
+				.set({ Authorization: `Bearer ${token}` })
+				.send({ rating: 5 });
+
+			const parsed = JSON.parse(response.text);
+			expect(response.status).toBe(200);
+			expect(parsed.message).toBe('Edited Rating -- Success!');
+			expect(parsed.data.rating).toBe(5);
+		});
+	});
+
+	describe('DELETE /api/restricted/diner/:userId/menuitem', () => {
+		beforeEach(async () => {
+			await request(server).post('/api/diner/register').send(diner1);
+			await db('trucks').insert(truck1);
+			await db('menu_items').insert(menuItem1);
+			await db('diners_menu_items_ratings').insert(menuRating1);
+		});
+
+		it('should not allow a user without credentials access', async () => {
+			const response = await request(server).delete(
+				'/api/restricted/diner/1/menuitem'
+			);
+			expect(response.status).toBe(401);
+		});
+
+		it('should allow a user with credentials access', async () => {
+			const login = await request(server).post('/api/diner/login').send({
+				username: diner1.username,
+				password: diner1.password,
+			});
+			const { token } = JSON.parse(login.text);
+
+			const response = await request(server)
+				.delete('/api/restricted/diner/1/menuitem')
+				.set({ Authorization: `Bearer ${token}` });
+			const parsed = JSON.parse(response.text);
+			expect(response.status).toBe(200);
+			expect(parsed.message).toBe('Deleted Rating -- Success!');
+		});
+	});
+
+	describe('GET /api/restricted/diner/:userId/favoritetrucks', () => {
+		beforeEach(async () => {
+			await request(server).post('/api/diner/register').send(diner1);
+			await db('trucks').insert(truck1);
+			await db('diner_favorite_trucks').insert(favoriteTruck1);
+		});
+
+		it('should not allow a user without credentials access', async () => {
+			const response = await request(server).get(
+				'/api/restricted/diner/1/favoritetrucks'
+			);
+			expect(response.status).toBe(401);
+		});
+
+		it('should allow a user with credentials access', async () => {
+			const login = await request(server).post('/api/diner/login').send({
+				username: diner1.username,
+				password: diner1.password,
+			});
+			const { token } = JSON.parse(login.text);
+
+			const response = await request(server)
+				.get('/api/restricted/diner/1/favoritetrucks')
+				.set({ Authorization: `Bearer ${token}` });
+			const parsed = JSON.parse(response.text);
+			expect(response.status).toBe(200);
+			expect.arrayContaining(parsed.text);
+		});
+	});
+
+	describe('POST /api/restricted/diner/:userId/favoritetrucks', () => {
+		beforeEach(async () => {
+			await request(server).post('/api/diner/register').send(diner1);
+			await db('trucks').insert(truck1);
+		});
+
+		it('should not allow a user without credentials access', async () => {
+			const response = await request(server)
+				.post('/api/restricted/diner/1/favoritetrucks')
+				.send(favoriteTruck1);
+			expect(response.status).toBe(401);
+		});
+
+		it('should allow a user with credentials access', async () => {
+			const login = await request(server).post('/api/diner/login').send({
+				username: diner1.username,
+				password: diner1.password,
+			});
+			const { token } = JSON.parse(login.text);
+			const response = await request(server)
+				.post('/api/restricted/diner/1/favoritetrucks')
+				.set({ Authorization: `Bearer ${token}` })
+				.send(favoriteTruck1);
+			expect(response.status).toBe(201);
+		});
+	});
+
+	describe('DELETE /api/restricted/diner/:userId/favoritetrucks', () => {
+		beforeEach(async () => {
+			await request(server).post('/api/diner/register').send(diner1);
+			await db('trucks').insert(truck1);
+			await db('diner_favorite_trucks').insert(favoriteTruck1);
+		});
+
+		it('should not allow a user without credentials access', async () => {
+			const response = await request(server).delete(
+				'/api/restricted/diner/1/favoritetrucks'
+			);
+			expect(response.status).toBe(401);
+		});
+
+		it('should allow a user with credentials access', async () => {
+			const login = await request(server).post('/api/diner/login').send({
+				username: diner1.username,
+				password: diner1.password,
+			});
+			const { token } = JSON.parse(login.text);
+
+			const response = await request(server)
+				.delete('/api/restricted/diner/1/favoritetrucks')
+				.set({ Authorization: `Bearer ${token}` });
+			const parsed = JSON.parse(response.text);
+			expect(response.status).toBe(200);
+			expect(parsed.message).toBe('Deleted Favorite -- Success!!');
 		});
 	});
 });
