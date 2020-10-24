@@ -410,7 +410,6 @@ describe('diners-model', () => {
 			const user = await db('diners').where({ id: 1 }).first();
 			const body = {
 				rating: 4,
-				// diner_id: user.id,
 				menu_item_id: 1,
 			};
 			await addMenuItemRating(user.id, body);
